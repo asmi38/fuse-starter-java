@@ -1,6 +1,7 @@
 package org.galatea.starter.entrypoint;
 
 import java.util.List;
+import javax.validation.constraints.NotBlank;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,7 @@ public class IexRestController {
   @GetMapping(value = "${mvc.iex.getHistoricalPricePath}", produces = {
       MediaType.APPLICATION_JSON_VALUE})
   public List<IexHistoricalPrice> getHistoricalPrices(
-      @RequestParam(value = "symbol") final String symbol,
+      @RequestParam(value = "symbol") @NotBlank final String symbol,
       @RequestParam(value = "range", required = false) final String range,
       @RequestParam(value = "date", required = false) final String date) {
     return iexService.getHistoricalPrices(symbol, range, date);

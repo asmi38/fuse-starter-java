@@ -58,9 +58,7 @@ public class IexService {
       final String symbol,
       final String range,
       final String date) {
-    if (symbol.isEmpty()) {
-      return Collections.emptyList();
-    } else if (date == null && range == null){
+    if (date == null && range == null) {
       return iexCloudClient.getHistoricalPricesSymbol(symbol);
     } else if (range == null) {
       return iexCloudClient.getHistoricalPricesDate(symbol, date);

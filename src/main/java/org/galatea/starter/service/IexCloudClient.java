@@ -5,7 +5,6 @@ import org.galatea.starter.domain.IexHistoricalPrice;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * A Feign Declarative REST Client to access endpoints from the Cloud IEX API to get market

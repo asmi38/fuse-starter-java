@@ -19,6 +19,7 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class IexRestControllerTest extends ASpringTest {
     MvcResult result = this.mvc.perform(
         // note that we were are testing the fuse REST end point here, not the IEX end point.
         // the fuse end point in turn calls the IEX end point, which is WireMocked for this test.
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/iex/symbols")
+        MockMvcRequestBuilders.get("/iex/symbols")
             .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
         // some simple validations, in practice I would expect these to be much more comprehensive.
@@ -59,7 +60,7 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetLastTradedPrice() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/lastTradedPrice?symbols=AAPL")
             // This URL will be hit by the MockMvc client. The result is configured in the file
             // src/test/resources/wiremock/mappings/mapping-lastTradedPrice.json
@@ -74,7 +75,7 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetLastTradedPriceEmpty() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/lastTradedPrice?symbols=")
             .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
@@ -86,7 +87,7 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetHistoricalPriceSymbol() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
           .get("/iex/historicalPrice?symbol=twtr")
           .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
@@ -104,7 +105,7 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetHistoricalPriceSymbolDate() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/historicalPrice?symbol=twtr&date=20210405")
             .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
@@ -122,7 +123,7 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetHistoricalPriceSymbolRange() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/historicalPrice?symbol=twtr&range=3d")
             .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
@@ -140,7 +141,7 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetHistoricalPriceSymbolRangeDate() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/historicalPrice?symbol=twtr&range=1m&date=20210210")
             .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
@@ -158,11 +159,10 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetHistoricalPriceEmpty() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/historicalPrice?symbol=")
             .accept(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", is(Collections.emptyList())))
+        .andExpect(status().isBadRequest())
         .andReturn();
   }
 }
