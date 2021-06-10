@@ -165,4 +165,15 @@ public class IexRestControllerTest extends ASpringTest {
         .andExpect(status().isBadRequest())
         .andReturn();
   }
+
+  @Test
+  public void testGetHistoricalPriceFail() throws Exception {
+
+    MvcResult result = this.mvc.perform(
+        MockMvcRequestBuilders
+            .get("/iex/historicalPrice?symbol=twtrF")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().is5xxServerError())
+        .andReturn();
+  }
 }
