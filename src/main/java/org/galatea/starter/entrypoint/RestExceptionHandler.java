@@ -76,7 +76,7 @@ public class RestExceptionHandler {
 
   @ExceptionHandler(FeignException.class)
   protected ResponseEntity<Object> handleFeignStatusException(final FeignException exception) {
-    log.debug("Error connecting to IEX", exception);
+    log.error("Error connecting to IEX", exception);
 
     ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, exception.toString());
     return buildResponseEntity(error);
