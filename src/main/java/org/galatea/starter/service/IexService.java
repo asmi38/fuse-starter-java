@@ -6,8 +6,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.galatea.starter.domain.IexHistoricalPrice;
+import org.galatea.starter.domain.IexHistoricalPriceEntity;
 import org.galatea.starter.domain.IexLastTradedPrice;
 import org.galatea.starter.domain.IexSymbol;
+import org.galatea.starter.domain.rpsy.IexHistoricalPriceRpsy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -23,6 +25,8 @@ public class IexService {
   private IexClient iexClient;
   @NonNull
   private IexCloudClient iexCloudClient;
+  @NonNull
+  private IexHistoricalPriceRpsy historicalPriceRspy;
 
   /**
    * Get all stock symbols from IEX.
@@ -58,14 +62,38 @@ public class IexService {
       final String symbol,
       final String range,
       final String date) {
+    List<IexHistoricalPrice> historicalPriceList;
     if (date == null && range == null) {
-      return iexCloudClient.getHistoricalPricesSymbol(symbol);
+      historicalPriceList = iexCloudClient.getHistoricalPricesSymbol(symbol);
     } else if (range == null) {
-      return iexCloudClient.getHistoricalPricesDate(symbol, date);
+      historicalPriceList = iexCloudClient.getHistoricalPricesDate(symbol, date);
     } else if (date == null) {
-      return iexCloudClient.getHistoricalPricesRange(symbol, range);
+      historicalPriceList = iexCloudClient.getHistoricalPricesRange(symbol, range);
     } else {
-      return iexCloudClient.getHistoricalPrices(symbol, range, date);
+      historicalPriceList = iexCloudClient.getHistoricalPrices(symbol, range, date);
+    }
+
+    addHistoricalPricesToDB(historicalPriceList);
+
+    return historicalPriceList;
+  }
+
+  /**
+   * Convert each historical price to an entity and add to the database.
+   * @param historicalPriceList a list of Historical Prices fetched from the IEX API
+   */
+  public void addHistoricalPricesToDB(final List<IexHistoricalPrice> historicalPriceList) {
+    for (IexHistoricalPrice price : historicalPriceList) {
+      IexHistoricalPriceEntity entity = new IexHistoricalPriceEntity(
+          price.getSymbol(),
+          price.getDate(),
+          price.getClose(),
+          price.getHigh(),
+          price.getLow(),
+          price.getOpen(),
+          price.getVolume());
+      historicalPriceRspy.save(entity);
+      log.info("Adding to database: " + entity.toString());
     }
   }
 }

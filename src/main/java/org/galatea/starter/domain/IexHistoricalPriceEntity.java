@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,7 @@ import lombok.NonNull;
 @Builder
 @IdClass(IexHistoricalPriceId.class)
 @Entity
+@Table(name = "HISTORICAL_PRICE")
 public class IexHistoricalPriceEntity {
 
   @Id
