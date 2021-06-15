@@ -19,6 +19,7 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class IexRestControllerTest extends ASpringTest {
     MvcResult result = this.mvc.perform(
         // note that we were are testing the fuse REST end point here, not the IEX end point.
         // the fuse end point in turn calls the IEX end point, which is WireMocked for this test.
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/iex/symbols")
+        MockMvcRequestBuilders.get("/iex/symbols")
             .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
         // some simple validations, in practice I would expect these to be much more comprehensive.
@@ -59,7 +60,7 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetLastTradedPrice() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/lastTradedPrice?symbols=FB")
             // This URL will be hit by the MockMvc client. The result is configured in the file
             // src/test/resources/wiremock/mappings/mapping-lastTradedPrice.json
@@ -74,11 +75,105 @@ public class IexRestControllerTest extends ASpringTest {
   public void testGetLastTradedPriceEmpty() throws Exception {
 
     MvcResult result = this.mvc.perform(
-        org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+        MockMvcRequestBuilders
             .get("/iex/lastTradedPrice?symbols=")
             .accept(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", is(Collections.emptyList())))
+        .andReturn();
+  }
+
+  @Test
+  public void testGetHistoricalPriceSymbol() throws Exception {
+
+    MvcResult result = this.mvc.perform(
+        MockMvcRequestBuilders
+          .get("/iex/historicalPrice?symbol=twtr")
+          .accept(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].close").value(new BigDecimal("51.81")))
+        .andExpect(jsonPath("$[0].high").value(new BigDecimal("53.08")))
+        .andExpect(jsonPath("$[0].low").value(new BigDecimal("51.62")))
+        .andExpect(jsonPath("$[0].open").value(new BigDecimal("53.01")))
+        .andExpect(jsonPath("$[0].symbol", is("TWTR")))
+        .andExpect(jsonPath("$[0].volume").value(17362305))
+        .andExpect(jsonPath("$[0].date", is("2021-05-10")))
+        .andReturn();
+  }
+
+  @Test
+  public void testGetHistoricalPriceSymbolDate() throws Exception {
+
+    MvcResult result = this.mvc.perform(
+        MockMvcRequestBuilders
+            .get("/iex/historicalPrice?symbol=twtr&date=20210405")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].close").value(new BigDecimal("64.24")))
+        .andExpect(jsonPath("$[0].high").value(new BigDecimal("64.34")))
+        .andExpect(jsonPath("$[0].low").value(new BigDecimal("61.81")))
+        .andExpect(jsonPath("$[0].open").value(new BigDecimal("64.14")))
+        .andExpect(jsonPath("$[0].symbol", is("TWTR")))
+        .andExpect(jsonPath("$[0].volume").value(15502130))
+        .andExpect(jsonPath("$[0].date", is("2021-04-05")))
+        .andReturn();
+  }
+
+  @Test
+  public void testGetHistoricalPriceSymbolRange() throws Exception {
+
+    MvcResult result = this.mvc.perform(
+        MockMvcRequestBuilders
+            .get("/iex/historicalPrice?symbol=twtr&range=3d")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].close").value(new BigDecimal("57.01")))
+        .andExpect(jsonPath("$[0].high").value(new BigDecimal("58.67")))
+        .andExpect(jsonPath("$[0].low").value(new BigDecimal("55.83")))
+        .andExpect(jsonPath("$[0].open").value(new BigDecimal("56.96")))
+        .andExpect(jsonPath("$[0].symbol", is("TWTR")))
+        .andExpect(jsonPath("$[0].volume").value(21985673))
+        .andExpect(jsonPath("$[0].date", is("2021-06-03")))
+        .andReturn();
+  }
+
+  @Test
+  public void testGetHistoricalPriceSymbolRangeDate() throws Exception {
+
+    MvcResult result = this.mvc.perform(
+        MockMvcRequestBuilders
+            .get("/iex/historicalPrice?symbol=twtr&range=1m&date=20210210")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].close").value(new BigDecimal("67.77")))
+        .andExpect(jsonPath("$[0].high").value(new BigDecimal("69.25")))
+        .andExpect(jsonPath("$[0].low").value(new BigDecimal("63.2")))
+        .andExpect(jsonPath("$[0].open").value(new BigDecimal("65.8")))
+        .andExpect(jsonPath("$[0].symbol", is("TWTR")))
+        .andExpect(jsonPath("$[0].volume").value(73649183))
+        .andExpect(jsonPath("$[0].date", is("2021-02-10")))
+        .andReturn();
+  }
+
+  @Test
+  public void testGetHistoricalPriceEmpty() throws Exception {
+
+    MvcResult result = this.mvc.perform(
+        MockMvcRequestBuilders
+            .get("/iex/historicalPrice?symbol=")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isBadRequest())
+        .andReturn();
+  }
+
+  @Test
+  public void testGetHistoricalPriceFail() throws Exception {
+
+    MvcResult result = this.mvc.perform(
+        MockMvcRequestBuilders
+            .get("/iex/historicalPrice?symbol=twtrF")
+            .accept(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().is5xxServerError())
         .andReturn();
   }
 }
