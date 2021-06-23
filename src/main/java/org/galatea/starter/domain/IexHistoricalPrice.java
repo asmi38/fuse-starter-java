@@ -1,10 +1,13 @@
 package org.galatea.starter.domain;
 
 import java.math.BigDecimal;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder
 public class IexHistoricalPrice {
   private BigDecimal close;

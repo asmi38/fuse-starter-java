@@ -54,7 +54,7 @@ public class IexRestController {
    * Get the historical price for each of the symbols passed in.
    *
    * @param symbol list of symbols to get the historical price for.
-   * @param date list of days to get the historical price for.
+   * @param date list of days to get the historical price for in the format YYYY-MM-DD.
    * @param range range of time from the specified date to get data for.
    * @return a list of daily prices for date and range specified for the particular symbol.
    */

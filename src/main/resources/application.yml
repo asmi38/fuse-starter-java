@@ -9,12 +9,18 @@ spring:
       # in case you want to use H2 with a file persistence or as a service
       # reference http://www.h2database.com/html/cheatSheet.html and
       # http://www.h2database.com/html/tutorial.html#using_server
-      url: jdbc:h2:mem:testtest
+      url: jdbc:h2:mem:testdb
       driver-class-name: org.h2.Driver
+      username: sa
+      password:
    jpa:
       hibernate:
          ddl-auto: update
       database-platform: org.hibernate.dialect.MySQL5Dialect
+   h2:
+      console:
+        enabled: true
+        path: /h2
 
 mvc:
    settleMissionPath: /settlementEngine
@@ -54,6 +60,9 @@ spring:
 ---
 # Dev properties go here
 spring:
+   jpa:
+      show-sql: true
+      properties.hibernate.format_sql: true
    profiles: dev
    datasource:
       username: sa
