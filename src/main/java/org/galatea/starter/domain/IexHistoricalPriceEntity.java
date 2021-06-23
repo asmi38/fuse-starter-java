@@ -1,6 +1,7 @@
 package org.galatea.starter.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -28,7 +29,7 @@ public class IexHistoricalPriceEntity {
 
   @Id
   @NonNull
-  private String date;
+  private LocalDate date;
 
   @NonNull
   private BigDecimal close;
